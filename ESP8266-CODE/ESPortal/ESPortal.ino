@@ -82,22 +82,22 @@ void setup() {
 
   //generic catch all login page for domains not listed in configuration
   webServer.on(SITEOTHER_redirect,[]() {
-    webServer.send(200, "text/html", SITE_OTHER_HTML);
+    webServer.send_P(200, "text/html", SITE_OTHER_HTML);
   });
 
   //SITE1 login page
   webServer.on(SITE1_redirect,[]() {
-    webServer.send(200, "text/html", SITE1_HTML);
+    webServer.send_P(200, "text/html", SITE1_HTML);
   });
 
   //SITE2 login page
   webServer.on(SITE2_redirect,[]() {
-    webServer.send(200, "text/html", SITE2_HTML);
+    webServer.send_P(200, "text/html", SITE2_HTML);
   });
 
   //SITE3 login page
   webServer.on(SITE3_redirect,[]() {
-    webServer.send(200, "text/html", SITE3_HTML);
+    webServer.send_P(200, "text/html", SITE3_HTML);
   });
 
     //Portal login page
